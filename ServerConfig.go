@@ -13,11 +13,11 @@ func NewServerConfig() *ServerConfig { // {{{
 type ServerConfig struct {
 	config
 
-	Host             string
-	Port             int
-	NumWorkerJobs    int // Number of worker Jobs (per worker)
-	NumServerWorkers int // Number of server workers
-	LogMode          bool
+	Host      string
+	Port      int
+	PoolSize  int // Size of poll
+	QueueSize int // Size of Queue
+	LogMode   bool
 }
 
 func (this *ServerConfig) Name() string { // {{{
