@@ -11,7 +11,7 @@ func NewServerConfig() *ServerConfig { // {{{
 } // }}}
 
 type ServerConfig struct {
-	config
+	BaseConfig
 
 	Host      string
 	Port      int
@@ -26,15 +26,4 @@ func (this *ServerConfig) Name() string { // {{{
 
 func (this *ServerConfig) Addr() string { // {{{
 	return fmt.Sprintf("%s:%d", this.Host, this.Port)
-} // }}}
-
-func (this *ServerConfig) Filepath(dir string) string { // {{{
-	return filepath(dir, this)
-} // }}}
-
-func (this *ServerConfig) Load(dir string) error { // {{{
-	err := load(this.Filepath(dir), this)
-	this.setLoaded(err == nil)
-
-	return err
 } // }}}

@@ -1,88 +1,21 @@
 package webconfig
 
 import (
-	"fmt"
-	"io/ioutil"
-	"path"
-
-	"encoding/json"    // JSON (http://www.json.org/)
-	"gopkg.in/yaml.v2" // YAML (http://www.yaml.org/)
+//	"fmt"
+//	"io/ioutil"
+//	"path"
 )
-
-const (
-	CONFIG_TYPE_JSON = "json"
-	CONFIG_TYPE_YAML = "yaml"
-
-	CONFIG_MAIN     = "main"
-	CONFIG_SERVER   = "server"
-	CONFIG_DATABASE = "database"
-)
-
-var (
-	configType = CONFIG_TYPE_JSON
-)
-
-func UseYaml() { // {{{
-	configType = CONFIG_TYPE_YAML
-} // }}}
-
-func UseJson() { // {{{
-	configType = CONFIG_TYPE_JSON
-} // }}}
-
-func load(file string, config interface{}) error { // {{{
-	data, err := ioutil.ReadFile(file)
-	if err != nil {
-		return err
-	}
-
-	switch configType {
-	case CONFIG_TYPE_YAML:
-		return yaml.Unmarshal(data, config)
-	case CONFIG_TYPE_JSON:
-		return json.Unmarshal(data, config)
-	default:
-		return fmt.Errorf("Unknown parser: '%s'", configType)
-	}
-} // }}}
-
-func filepath(dir string, config iConfig) string { // {{{
-	return path.Join(dir, fmt.Sprintf("%s.%s", config.Name(), configType))
-} // }}}
-
-// [iConfig]
-
-type iConfig interface {
-	Name() string
-	Filepath(dir string) string
-	Load(dir string) error
-}
-
-// [config]
-
-type config struct {
-	iConfig
-
-	loaded bool
-}
-
-func (this *config) setLoaded(loaded bool) { // {{{
-	this.loaded = loaded
-} // }}}
-
-func (this *config) IsLoaded() bool { // {{{
-	return this.loaded
-} // }}}
 
 // [Config]
 
-func LoadConfig(path string) (*Config, *ConfigErrors) { // {{{
-	config := NewConfig()
-	return config, config.Load(path)
+func LoadConfig(appConfig ConfigInterface, dir string) (*Config, *ConfigErrors) { // {{{
+	config := NewConfig(appConfig)
+	return config, config.Load(dir)
 } // }}}
 
-func NewConfig() *Config { // {{{
+func NewConfig(appConfig ConfigInterface) *Config { // {{{
 	return &Config{
+		App:      appConfig,
 		Main:     NewMainConfig(),
 		Server:   NewServerConfig(),
 		Database: NewDatabaseConfig(),
@@ -90,12 +23,17 @@ func NewConfig() *Config { // {{{
 } // }}}
 
 type Config struct {
-	config
+	BaseConfig
 
+	App      ConfigInterface
 	Main     *MainConfig
 	Server   *ServerConfig
 	Database *DatabaseConfig
 }
+
+func (this *Config) HasApp() bool { // {{{
+	return this.App != nil && this.App.IsLoaded()
+} // }}}
 
 func (this *Config) HasMain() bool { // {{{
 	return this.Main != nil && this.Main.IsLoaded()
@@ -109,19 +47,23 @@ func (this *Config) HasDatabase() bool { // {{{
 	return this.Database != nil && this.Database.IsLoaded()
 } // }}}
 
-func (this *Config) Load(path string) *ConfigErrors { // {{{
+func (this *Config) Load(dir string) *ConfigErrors { // {{{
 	var err error
 	errs := make(ConfigErrors, 0)
 
-	if err = this.Main.Load(path); err != nil {
+	if err = Load(dir, this.App); err != nil {
+		errs[this.App.Name()] = err
+	}
+
+	if err = Load(dir, this.Main); err != nil {
 		errs[this.Main.Name()] = err
 	}
 
-	if err = this.Server.Load(path); err != nil {
+	if err = Load(dir, this.Server); err != nil {
 		errs[this.Server.Name()] = err
 	}
 
-	if err = this.Database.Load(path); err != nil {
+	if err = Load(dir, this.Database); err != nil {
 		errs[this.Database.Name()] = err
 	}
 

@@ -7,7 +7,7 @@ func NewMainConfig() *MainConfig { // {{{
 } // }}}
 
 type MainConfig struct {
-	config
+	BaseConfig
 
 	AppName    string // Name of application
 	ServerType string // HTTP|FCGI
@@ -17,17 +17,6 @@ type MainConfig struct {
 
 func (this *MainConfig) Name() string { // {{{
 	return CONFIG_MAIN
-} // }}}
-
-func (this *MainConfig) Filepath(dir string) string { // {{{
-	return filepath(dir, this)
-} // }}}
-
-func (this *MainConfig) Load(dir string) error { // {{{
-	err := load(this.Filepath(dir), this)
-	this.setLoaded(err == nil)
-
-	return err
 } // }}}
 
 func (this *MainConfig) IsServerType(serverType string) bool { // {{{
