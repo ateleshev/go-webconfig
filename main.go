@@ -5,13 +5,13 @@ import (
 	"io/ioutil"
 	"path"
 
-	"encoding/json"    // JSON (http://www.json.org/)
-	"gopkg.in/yaml.v2" // YAML (http://www.yaml.org/)
+	"encoding/json" // JSON (http://www.json.org/)
+	// 	"github.com/go-yaml/yaml" // YAML (http://www.yaml.org/)
 )
 
 const (
 	CONFIG_TYPE_JSON = "json"
-	CONFIG_TYPE_YAML = "yaml"
+	//	CONFIG_TYPE_YAML = "yaml"
 
 	CONFIG_APP      = "app"
 	CONFIG_MAIN     = "main"
@@ -23,9 +23,9 @@ var (
 	configType = CONFIG_TYPE_JSON
 )
 
-func UseYaml() { // {{{
-	configType = CONFIG_TYPE_YAML
-} // }}}
+//func UseYaml() { // {{{
+//	configType = CONFIG_TYPE_YAML
+//} // }}}
 
 func UseJson() { // {{{
 	configType = CONFIG_TYPE_JSON
@@ -53,8 +53,8 @@ func load(file string, config interface{}) error { // {{{
 	}
 
 	switch configType {
-	case CONFIG_TYPE_YAML:
-		return yaml.Unmarshal(data, config)
+	//	case CONFIG_TYPE_YAML:
+	//		return yaml.Unmarshal(data, config)
 	case CONFIG_TYPE_JSON:
 		return json.Unmarshal(data, config)
 	default:
