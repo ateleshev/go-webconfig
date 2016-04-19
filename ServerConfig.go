@@ -1,9 +1,5 @@
 package webconfig
 
-import (
-	"fmt"
-)
-
 // [ServerConfig]
 
 func NewServerConfig() *ServerConfig { // {{{
