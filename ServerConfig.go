@@ -9,6 +9,7 @@ func NewServerConfig() *ServerConfig { // {{{
 type ServerConfig struct {
 	BaseConfig
 
+	Secure    bool
 	Host      string
 	Addr      string
 	PoolSize  int // Size of poll
